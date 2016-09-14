@@ -19,7 +19,7 @@ namespace RFID.Conexion
             //Conexion
             try
             {
-                conexion.ConnectionString = url;
+                conexion.ConnectionString = url; 
                 conexion.Open();
             }
             catch (Exception)
