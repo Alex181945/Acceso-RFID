@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.button4 = new System.Windows.Forms.Button();
+            this.btnImagen = new System.Windows.Forms.Button();
             this.btnSalir = new System.Windows.Forms.Button();
             this.btnModificar = new System.Windows.Forms.Button();
             this.btnRegistrar = new System.Windows.Forms.Button();
@@ -66,7 +66,7 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.button4);
+            this.panel1.Controls.Add(this.btnImagen);
             this.panel1.Controls.Add(this.btnSalir);
             this.panel1.Controls.Add(this.btnModificar);
             this.panel1.Controls.Add(this.btnRegistrar);
@@ -81,15 +81,16 @@
             this.panel1.Size = new System.Drawing.Size(1115, 623);
             this.panel1.TabIndex = 0;
             // 
-            // button4
+            // btnImagen
             // 
-            this.button4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.button4.Location = new System.Drawing.Point(52, 241);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(110, 30);
-            this.button4.TabIndex = 28;
-            this.button4.Text = "Capturar";
-            this.button4.UseVisualStyleBackColor = true;
+            this.btnImagen.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.btnImagen.Location = new System.Drawing.Point(52, 241);
+            this.btnImagen.Name = "btnImagen";
+            this.btnImagen.Size = new System.Drawing.Size(110, 30);
+            this.btnImagen.TabIndex = 28;
+            this.btnImagen.Text = "Capturar";
+            this.btnImagen.UseVisualStyleBackColor = true;
+            this.btnImagen.Click += new System.EventHandler(this.button4_Click);
             // 
             // btnSalir
             // 
@@ -402,7 +403,7 @@
         private System.Windows.Forms.Button btnModificar;
         private System.Windows.Forms.Button btnRegistrar;
         private System.Windows.Forms.PictureBox boxImagen;
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button btnImagen;
     }
 }
 
