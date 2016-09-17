@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -82,9 +84,7 @@ namespace RFID
                     FuenteDeVideo = new VideoCaptureDevice(DispositivoDeVideo[0].MonikerString);
                     FuenteDeVideo.NewFrame += new NewFrameEventHandler(Video_NuevoFrame);
                     FuenteDeVideo.Start();
-                    btnImagen.Text = "Detener";
-                    //cboDispositivos.Enabled = false;
-                    //gbMenu.Text = DispositivoDeVideo[cboDispositivos.SelectedIndex].Name.ToString();
+                    btnImagen.Text = "Guardar";
 
                 }
                 else
@@ -96,8 +96,9 @@ namespace RFID
                 if (FuenteDeVideo.IsRunning)
                 {
                     TerminarFuenteDeVideo();
-                    btnImagen.Text = "Guardar";
-                    //cboDispositivos.Enabled = true;
+                    MemoryStream ms = new MemoryStream();
+                    boxImagen.Image.Save(ms, ImageFormat.Gif);
+                    bImagen = ms.ToArray();
                 }
             }
         }
@@ -113,7 +114,6 @@ namespace RFID
             else
             {
                 ExisteDispositivo = true;
-                //CargarDispositivos(DispositivoDeVideo);
             }
         }
 
@@ -127,15 +127,6 @@ namespace RFID
                 }
 
         }
-
-        /*public void CargarDispositivos(FilterInfoCollection Dispositivos)
-        {
-
-            for (int i = 0; i < Dispositivos.Count; i++){
-                cbxDispositivos.Items.Add(Dispositivos[0].Name.ToString());
-                cbxDispositivos.Text = cbxDispositivos.Items[0].ToString();
-            }
-        }*/
 
         public void Video_NuevoFrame(object sender, NewFrameEventArgs eventArgs)
         {
