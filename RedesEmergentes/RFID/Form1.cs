@@ -43,7 +43,6 @@ namespace RFID
             InitializeComponent();
             BuscarDispositivos();
             //txtNumeroC.Text = "131130383";
-            Consulta(131130383);
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
@@ -274,17 +273,17 @@ namespace RFID
             MySqlConnection conn = Conexion.Conexion.ConexionDB();
             MySqlCommand cmd = new MySqlCommand();
 
+            //Consulta exclusiva para datos, no foto
             try
             {
 
                 //Consulta de registro en base de datos
                 cmd.Connection = conn;
-                cmd.CommandText = "SELECT (num_control, nombre, Apaterno, Amaterno, tipo_sandre, carrera," +
-                    "semestre, nom_tutor, dircont, telecont) FROM alumnos WHERE num_control = @num_control";
+                cmd.CommandText = "SELECT num_control, nombre, Apaterno, Amaterno, tipo_sandre, carrera," +
+                    "semestre, nom_tutor, dircont, telecont FROM alumnos WHERE num_control = @num_control";
+                
                 cmd.Parameters.AddWithValue("@num_control", numControl);
-                /*byte[] imgArr = (byte[])cmd.ExecuteScalar();
-                imgArr = (byte[])cmd.ExecuteScalar();
-                var stream = new MemoryStream(imgArr);*/
+
                 MySqlDataReader table = cmd.ExecuteReader();
 
                 while (table.Read())
@@ -293,27 +292,62 @@ namespace RFID
                     txtNombre.Text    = table.GetString("nombre");
                     txtAP1.Text       = table.GetString("Apaterno");
                     txtAP2.Text       = table.GetString("Amaterno");
-                    txtSangre.Text    = table.GetString("tipo_sandre");
                     txtCarrera.Text   = table.GetString("carrera");
                     txtSemestre.Text  = table.GetInt32("semestre").ToString();
-                    txtTutor.Text     = table.GetString("nom_tutor");
-                    txtDireccion.Text = table.GetString("dircont");
+                    txtSangre.Text    = table.GetString("tipo_sandre");
                     txtTelefono.Text  = table.GetInt32("telecont").ToString();
-                    /*Image img = Image.FromStream(stream);
-                    boxImagen.Image = img;*/
+                    txtDireccion.Text = table.GetString("dircont");
+                    txtTutor.Text     = table.GetString("nom_tutor");
+                    
+                    
                 }
+
+                /*cmd.CommandText = "SELECT * FROM alumnos WHERE num_control = @num_control";
+                byte[] imgArr = (byte[])cmd.ExecuteScalar();
+                imgArr = (byte[])cmd.ExecuteScalar();
+                var stream = new MemoryStream(imgArr);
+                Image img = Image.FromStream(stream);
+                boxImagen.Image = img;*/
             }
             catch (Exception)
             {
                 MessageBox.Show("Error Intente Mas Tarde");
+                throw;
             }
             finally
             {
                 conn.Close();
             }
 
+            //Consulta exclusiva para foto, no datos
+            try
+            {
+                conn = Conexion.Conexion.ConexionDB();
+
+                //Consulta de registro en base de datos
+                cmd.Connection = conn;
+                cmd.CommandText = "SELECT imagen FROM alumnos WHERE num_control = @num_control";
+
+                bImagen = (byte[])cmd.ExecuteScalar();
+                var stream = new MemoryStream(bImagen);
+
+                Image img = Image.FromStream(stream);
+                boxImagen.Image = img;
+
+                conn.Close();
+
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error Intente Mas Tarde");
+                throw;
+            }
+
         }
 
-
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            Consulta(131130383);
+        }
     }
 }
