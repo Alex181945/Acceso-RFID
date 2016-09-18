@@ -25,7 +25,7 @@ namespace RFID
         private string cAP2      = "";
         private string cSangre   = "";
         private string cCarrera  = "";
-        private string cSemestre = "";
+        private int    cSemestre = 0;
         private string cTutor    = "";
         private string cDirecc   = "";
         private int    cTel      = 0;
@@ -61,7 +61,7 @@ namespace RFID
             cAP2       = txtAP2.Text.ToUpper();
             cSangre    = txtSangre.Text.ToUpper();
             cCarrera   = txtCarrera.Text.ToUpper();
-            cSemestre  = txtSemestre.Text.ToUpper();
+            cSemestre  = int.Parse(txtSemestre.Text);
             cTutor     = txtTutor.Text.ToUpper();
             cDirecc    = txtDireccion.Text.ToUpper();
             cTel       = int.Parse(txtTelefono.Text);
@@ -71,26 +71,32 @@ namespace RFID
                 MessageBox.Show(Validaciones());
             else {
 
-                //Conexion a la Base de Datos
-                MySqlConnection conn = Conexion.Conexion.ConexionDB();
-                MySqlCommand cmd = new MySqlCommand();
+                try
+                {
+                    //Conexion a la Base de Datos
+                    MySqlConnection conn = Conexion.Conexion.ConexionDB();
+                    MySqlCommand cmd = new MySqlCommand();
 
-                //Almacenamiento de registro en base de datos
-                cmd.Connection = conn;
-                cmd.CommandText = "INSERT INTO alumnos VALUES (@num_control, @nombre, @Apaterno " +
-                    "@Amaterno, @carrera, @semestre, @tipo_sandre, @telecont, @dircont, @nom_tutor, @imagen)";
-                cmd.Parameters.AddWithValue("@num_control", cNumeroC);
-                cmd.Parameters.AddWithValue("@nombre", cNombre);
-                cmd.Parameters.AddWithValue("@Apaterno", cAP1);
-                cmd.Parameters.AddWithValue("@Amaterno", cAP2);
-                cmd.Parameters.AddWithValue("@carrera", cSangre);
-                cmd.Parameters.AddWithValue("@semestre", cCarrera);
-                cmd.Parameters.AddWithValue("@tipo_sandre", cSemestre);
-                cmd.Parameters.AddWithValue("@telecont", cTutor);
-                cmd.Parameters.AddWithValue("@dircont", cDirecc);
-                cmd.Parameters.AddWithValue("@nom_tutor", cTel);
-                cmd.Parameters.AddWithValue("@imagen", bImagen);
-                cmd.ExecuteNonQuery();
+                    //Almacenamiento de registro en base de datos
+                    cmd.CommandText = "INSERT INTO alumnos VALUES (@num_control, @nombre, @Apaterno " +
+                        "@Amaterno, @carrera, @semestre, @tipo_sandre, @telecont, @dircont, @nom_tutor, @imagen)";
+                    cmd.Parameters.AddWithValue("@num_control", cNumeroC);
+                    cmd.Parameters.AddWithValue("@nombre", cNombre);
+                    cmd.Parameters.AddWithValue("@Apaterno", cAP1);
+                    cmd.Parameters.AddWithValue("@Amaterno", cAP2);
+                    cmd.Parameters.AddWithValue("@carrera", cSangre);
+                    cmd.Parameters.AddWithValue("@semestre", cCarrera);
+                    cmd.Parameters.AddWithValue("@tipo_sandre", cSemestre);
+                    cmd.Parameters.AddWithValue("@telecont", cTutor);
+                    cmd.Parameters.AddWithValue("@dircont", cDirecc);
+                    cmd.Parameters.AddWithValue("@nom_tutor", cTel);
+                    cmd.Parameters.AddWithValue("@imagen", bImagen);
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Error Intente Mas Tarde");
+                }
             }
         }
 
@@ -157,7 +163,7 @@ namespace RFID
 
         public String Validaciones()
         {
-            if (cNumeroC == 0 || cNumeroC == null)
+            if (cNumeroC == 0)
             {
                 return "No hay Numero de Control Asociaso al Alumno";
             }
@@ -173,11 +179,11 @@ namespace RFID
                 return "Ingrese la Carrera del Alumno";
             }
 
-            if (cSemestre == "" || cSemestre == null){
+            if (cSemestre == 0){
                 return "Ingrese el Semestre del Alumno";
             }
 
-            if (cTel == 0 || cTel == null){
+            if (cTel == 0){
                 return "Ingrese el Numero Telefonico del Alumno";
             }
 

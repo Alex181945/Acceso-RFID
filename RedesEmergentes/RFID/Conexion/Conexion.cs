@@ -14,7 +14,9 @@ namespace RFID.Conexion
         {
             //Variables para la conexion
             MySqlConnection conexion = new MySqlConnection();
-            String url = "Server=localhost; Database= ; Uid=root; Pwd=1234";
+            //String url = "Server=localhost; Database= ; Username=root; Password=1234";
+            //OJO Esto es si ocupas el miniserver
+            String url = "Server=127.0.0.1; Port=3311; Database=redesemergentes; Uid=root; Pwd=root;";
 
             //Conexion
             try
