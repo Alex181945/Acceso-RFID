@@ -101,6 +101,7 @@
             this.btnSalir.TabIndex = 27;
             this.btnSalir.Text = "Salir";
             this.btnSalir.UseVisualStyleBackColor = true;
+            this.btnSalir.Click += new System.EventHandler(this.btnSalir_Click);
             // 
             // btnModificar
             // 
@@ -111,6 +112,7 @@
             this.btnModificar.TabIndex = 26;
             this.btnModificar.Text = "Modificar";
             this.btnModificar.UseVisualStyleBackColor = true;
+            this.btnModificar.Click += new System.EventHandler(this.btnModificar_Click);
             // 
             // btnRegistrar
             // 
