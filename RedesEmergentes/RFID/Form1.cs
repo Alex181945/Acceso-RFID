@@ -52,7 +52,8 @@ namespace RFID
         {
             InitializeComponent();
             BuscarDispositivos();
-            bgw.DoWork += new System.ComponentModel.DoWorkEventHandler(bgw_DoWork);
+            //bgw.DoWork += new System.ComponentModel.DoWorkEventHandler(bgw_DoWork);
+            LecturaRFID();
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
@@ -420,13 +421,15 @@ namespace RFID
         {
             Limpiar();
             SerialPort serialPort = new SerialPort();
-            serialPort.PortName = "COM4";
+            serialPort.PortName   = "COM3";
             serialPort.BaudRate   = 9600;
             serialPort.Parity     = Parity.None;
             serialPort.DataBits   = 8;
-            serialPort.StopBits   = StopBits.One; serialPort.ReceivedBytesThreshold = 1;
+            serialPort.StopBits   = StopBits.One;
+            serialPort.ReceivedBytesThreshold = 1;
             serialPort.Open();
             var aux = serialPort.ReadLine();
+            txtNumeroC.Text = serialPort.ReadLine();
             serialPort.Close();
             return aux;
         }
@@ -438,11 +441,13 @@ namespace RFID
                 string[] ports = SerialPort.GetPortNames();
                 foreach (string port in ports)
                 {
+                    MessageBox.Show(port);
                     currentPort = new SerialPort(port, 9600);
                     if (DetectArduino())
                     {
                         portFound = true;
-                        break;
+                        txtNumeroC.Text = valor;
+
                     }
                     else
                     {
