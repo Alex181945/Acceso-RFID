@@ -8,6 +8,7 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,11 +39,20 @@ namespace RFID
         private VideoCaptureDevice FuenteDeVideo = null;
 
 
+        //Variables de Arduino
+        SerialPort currentPort;
+        bool portFound;
+        String valor;
+
+        //Segundo Plano
+        System.ComponentModel.BackgroundWorker bgw = new System.ComponentModel.BackgroundWorker();
+
+
         public Form1()
         {
             InitializeComponent();
             BuscarDispositivos();
-            //txtNumeroC.Text = "131130383";
+            bgw.DoWork += new System.ComponentModel.DoWorkEventHandler(bgw_DoWork);
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
@@ -94,6 +104,10 @@ namespace RFID
                     cmd.Parameters.AddWithValue("@nom_tutor", cTutor);
                     cmd.Parameters.AddWithValue("@imagen", bImagen);
                     cmd.ExecuteNonQuery();
+
+                    MessageBox.Show("Registro Guardado");
+
+                    Limpiar();
                 }
                 catch (Exception)
                 {
@@ -129,7 +143,7 @@ namespace RFID
                 {
                     TerminarFuenteDeVideo();
                     MemoryStream ms = new MemoryStream();
-                    boxImagen.Image.Save(ms, ImageFormat.Gif);
+                    boxImagen.Image.Save(ms, ImageFormat.Jpeg);
                     bImagen = ms.ToArray();
                 }
             }
@@ -231,38 +245,70 @@ namespace RFID
         {
             //Modificacion de los campos
 
-            //Conexion a la Base de Datos
-            MySqlConnection conn = Conexion.Conexion.ConexionDB();
-            MySqlCommand cmd = new MySqlCommand();
+            if (ConsultaLectura() == true){
 
-            try
-            {
+                //Quita solo lectura en consulta
+                txtNombre.ReadOnly    = false;
+                txtAP1.ReadOnly       = false;
+                txtAP2.ReadOnly       = false;
+                txtCarrera.ReadOnly   = false;
+                txtSemestre.ReadOnly  = false;
+                txtSangre.ReadOnly    = false;
+                txtTelefono.ReadOnly  = false;
+                txtDireccion.ReadOnly = false;
+                txtTutor.ReadOnly     = false;
 
-                //Almacenamiento de registro en base de datos
-                cmd.Connection = conn;
-                cmd.CommandText = "UPDATE alumnos SET (@nombre,@Apaterno,@Amaterno,@carrera," +
-                    "@semestre,@tipo_sandre,@telecont,@dircont,@nom_tutor,@imagen) WHERE num_control = @num_control";
-                cmd.Parameters.AddWithValue("@num_control", cNumeroC);
-                cmd.Parameters.AddWithValue("@nombre", cNombre);
-                cmd.Parameters.AddWithValue("@Apaterno", cAP1);
-                cmd.Parameters.AddWithValue("@Amaterno", cAP2);
-                cmd.Parameters.AddWithValue("@carrera", cCarrera);
-                cmd.Parameters.AddWithValue("@semestre", cSemestre);
-                cmd.Parameters.AddWithValue("@tipo_sandre", cSangre);
-                cmd.Parameters.AddWithValue("@telecont", cTel);
-                cmd.Parameters.AddWithValue("@dircont", cDirecc);
-                cmd.Parameters.AddWithValue("@nom_tutor", cTutor);
-                cmd.Parameters.AddWithValue("@imagen", bImagen);
-                cmd.ExecuteNonQuery();
             }
-            catch (Exception)
+            else
             {
-                MessageBox.Show("Error Intente Mas Tarde");
-                throw;
-            }
-            finally
-            {
-                conn.Close();
+                //Conexion a la Base de Datos
+                MySqlConnection conn = Conexion.Conexion.ConexionDB();
+                MySqlCommand cmd = new MySqlCommand();
+
+                try
+                {
+                    //Recapturando Datos
+                    cNumeroC = int.Parse(txtNumeroC.Text);
+                    cNombre = txtNombre.Text.ToUpper();
+                    cAP1 = txtAP1.Text.ToUpper();
+                    cAP2 = txtAP2.Text.ToUpper();
+                    cSangre = txtSangre.Text.ToUpper();
+                    cCarrera = txtCarrera.Text.ToUpper();
+                    cSemestre = int.Parse(txtSemestre.Text);
+                    cTutor = txtTutor.Text.ToUpper();
+                    cDirecc = txtDireccion.Text.ToUpper();
+                    cTel = int.Parse(txtTelefono.Text);
+
+                    //Almacenamiento de registro en base de datos
+                    cmd.Connection = conn;
+                    cmd.CommandText = "UPDATE alumnos SET nombre = @nombre, Apaterno = @Apaterno, Amaterno = @Amaterno, carrera = @carrera," +
+                        "semestre = @semestre, tipo_sandre = @tipo_sandre, telecont = @telecont, dircont = @dircont, nom_tutor = @nom_tutor," +
+                        "imagen = @imagen WHERE num_control = @num_control";
+                    cmd.Parameters.AddWithValue("@num_control", cNumeroC);
+                    cmd.Parameters.AddWithValue("@nombre", cNombre);
+                    cmd.Parameters.AddWithValue("@Apaterno", cAP1);
+                    cmd.Parameters.AddWithValue("@Amaterno", cAP2);
+                    cmd.Parameters.AddWithValue("@carrera", cCarrera);
+                    cmd.Parameters.AddWithValue("@semestre", cSemestre);
+                    cmd.Parameters.AddWithValue("@tipo_sandre", cSangre);
+                    cmd.Parameters.AddWithValue("@telecont", cTel);
+                    cmd.Parameters.AddWithValue("@dircont", cDirecc);
+                    cmd.Parameters.AddWithValue("@nom_tutor", cTutor);
+                    cmd.Parameters.AddWithValue("@imagen", bImagen);
+                    cmd.ExecuteNonQuery();
+
+                    MessageBox.Show("Cambio Guardados");
+                    Limpiar();
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Error Intente Mas Tarde");
+                    throw;
+                }
+                finally
+                {
+                    conn.Close();
+                }
             }
         }
 
@@ -272,6 +318,18 @@ namespace RFID
             //Conexion a la Base de Datos
             MySqlConnection conn = Conexion.Conexion.ConexionDB();
             MySqlCommand cmd = new MySqlCommand();
+
+
+            //Campos para solo lectura en consulta
+            txtNombre.ReadOnly    = true;
+            txtAP1.ReadOnly       = true;
+            txtAP2.ReadOnly       = true;
+            txtCarrera.ReadOnly   = true;
+            txtSemestre.ReadOnly  = true;
+            txtSangre.ReadOnly    = true;
+            txtTelefono.ReadOnly  = true;
+            txtDireccion.ReadOnly = true;
+            txtTutor.ReadOnly     = true;
 
             //Consulta exclusiva para datos, no foto
             try
@@ -301,13 +359,6 @@ namespace RFID
                     
                     
                 }
-
-                /*cmd.CommandText = "SELECT * FROM alumnos WHERE num_control = @num_control";
-                byte[] imgArr = (byte[])cmd.ExecuteScalar();
-                imgArr = (byte[])cmd.ExecuteScalar();
-                var stream = new MemoryStream(imgArr);
-                Image img = Image.FromStream(stream);
-                boxImagen.Image = img;*/
             }
             catch (Exception)
             {
@@ -345,9 +396,114 @@ namespace RFID
 
         }
 
+        public Boolean ConsultaLectura()
+        {
+            if (txtNumeroC.ReadOnly == true &&
+                txtNombre.ReadOnly == true &&
+                txtAP1.ReadOnly == true &&
+                txtAP2.ReadOnly == true &&
+                txtCarrera.ReadOnly == true &&
+                txtSemestre.ReadOnly == true &&
+                txtSangre.ReadOnly == true &&
+                txtTelefono.ReadOnly == true &&
+                txtDireccion.ReadOnly == true &&
+                txtTutor.ReadOnly == true)
+            {
+                return true;
+            }
+
+            return false;
+            
+        }
+
+        public String LecturaRFID()
+        {
+            Limpiar();
+            SerialPort serialPort = new SerialPort();
+            serialPort.PortName = "COM4";
+            serialPort.BaudRate   = 9600;
+            serialPort.Parity     = Parity.None;
+            serialPort.DataBits   = 8;
+            serialPort.StopBits   = StopBits.One; serialPort.ReceivedBytesThreshold = 1;
+            serialPort.Open();
+            var aux = serialPort.ReadLine();
+            serialPort.Close();
+            return aux;
+        }
+
+        private void SetComPort()
+        {
+            try
+            {
+                string[] ports = SerialPort.GetPortNames();
+                foreach (string port in ports)
+                {
+                    currentPort = new SerialPort(port, 9600);
+                    if (DetectArduino())
+                    {
+                        portFound = true;
+                        break;
+                    }
+                    else
+                    {
+                        portFound = false;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error: "+e);
+            }
+        }
+
+        private bool DetectArduino()
+        {
+            try
+            {
+                currentPort.Parity = Parity.None;
+                currentPort.DataBits = 8;
+                currentPort.StopBits = StopBits.One;
+                currentPort.ReceivedBytesThreshold = 1;
+                currentPort.Open();
+                valor = currentPort.ReadLine();
+                currentPort.Close();
+
+                if (valor == "")
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error: " + e);
+                return false;
+            }
+        }
+
+        public void Limpiar()
+        {
+            txtNumeroC.Text = "";
+            txtNombre.Text = "";
+            txtAP1.Text = "";
+            txtAP2.Text = "";
+            txtCarrera.Text = "";
+            txtSemestre.Text = "";
+            txtSangre.Text = "";
+            txtTelefono.Text = "";
+            txtDireccion.Text = "";
+            txtTutor.Text = "";
+        }
+
+        void bgw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            SetComPort();
+        }
+
         private void button1_Click_1(object sender, EventArgs e)
         {
-            Consulta(131130383);
+            Consulta(131130194);
         }
     }
 }
