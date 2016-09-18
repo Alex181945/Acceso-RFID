@@ -1,5 +1,6 @@
 ﻿using AForge.Video;
 using AForge.Video.DirectShow;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,7 +19,7 @@ namespace RFID
     {
 
         //Variables para formulario
-        private string cNumeroC  = "";
+        private int    cNumeroC  = 0;
         private string cNombre   = "";
         private string cAP1      = "";
         private string cAP2      = "";
@@ -27,7 +28,7 @@ namespace RFID
         private string cSemestre = "";
         private string cTutor    = "";
         private string cDirecc   = "";
-        private string cTel      = "";
+        private int    cTel      = 0;
 
 
         //Variable para imagen
@@ -41,6 +42,7 @@ namespace RFID
         {
             InitializeComponent();
             BuscarDispositivos();
+            txtNumeroC.Text = "131130383";
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
@@ -51,27 +53,45 @@ namespace RFID
         private void button1_Click(object sender, EventArgs e)
         {
             //Capturar Registro y Mandar a la Base
-            //Validacion de imagen
-            if (bImagen == null)
-            {
-                MessageBox.Show("Captura la imagen del estudiante");
-                return;
-            }
 
             //Obtencion de valores de cajas de texto
-            cNumeroC   = txtNumeroC.Text;
-            cNombre    = txtNombre.Text;
-            cAP1       = txtAP1.Text;
-            cAP2       = txtAP2.Text;
-            cSangre    = txtSangre.Text;
-            cCarrera   = txtCarrera.Text;
-            cSemestre  = txtSemestre.Text;
-            cTutor     = txtTutor.Text;
-            cDirecc    = txtDireccion.Text;
-            cTel       = txtTelefono.Text;
+            cNumeroC   = int.Parse(txtNumeroC.Text);
+            cNombre    = txtNombre.Text.ToUpper();
+            cAP1       = txtAP1.Text.ToUpper();
+            cAP2       = txtAP2.Text.ToUpper();
+            cSangre    = txtSangre.Text.ToUpper();
+            cCarrera   = txtCarrera.Text.ToUpper();
+            cSemestre  = txtSemestre.Text.ToUpper();
+            cTutor     = txtTutor.Text.ToUpper();
+            cDirecc    = txtDireccion.Text.ToUpper();
+            cTel       = int.Parse(txtTelefono.Text);
 
+            //Validacion de campos
+            if (Validaciones() != "")
+                MessageBox.Show(Validaciones());
+            else {
 
+                //Conexion a la Base de Datos
+                MySqlConnection conn = Conexion.Conexion.ConexionDB();
+                MySqlCommand cmd = new MySqlCommand();
 
+                //Almacenamiento de registro en base de datos
+                cmd.Connection = conn;
+                cmd.CommandText = "INSERT INTO alumnos VALUES (@num_control, @nombre, @Apaterno " +
+                    "@Amaterno, @carrera, @semestre, @tipo_sandre, @telecont, @dircont, @nom_tutor, @imagen)";
+                cmd.Parameters.AddWithValue("@num_control", cNumeroC);
+                cmd.Parameters.AddWithValue("@nombre", cNombre);
+                cmd.Parameters.AddWithValue("@Apaterno", cAP1);
+                cmd.Parameters.AddWithValue("@Amaterno", cAP2);
+                cmd.Parameters.AddWithValue("@carrera", cSangre);
+                cmd.Parameters.AddWithValue("@semestre", cCarrera);
+                cmd.Parameters.AddWithValue("@tipo_sandre", cSemestre);
+                cmd.Parameters.AddWithValue("@telecont", cTutor);
+                cmd.Parameters.AddWithValue("@dircont", cDirecc);
+                cmd.Parameters.AddWithValue("@nom_tutor", cTel);
+                cmd.Parameters.AddWithValue("@imagen", bImagen);
+                cmd.ExecuteNonQuery();
+            }
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -130,8 +150,51 @@ namespace RFID
 
         public void Video_NuevoFrame(object sender, NewFrameEventArgs eventArgs)
         {
+            //Imagen que si vizualiza en el picture box
             Bitmap Imagen = (Bitmap)eventArgs.Frame.Clone();
             boxImagen.Image = Imagen;
+        }
+
+        public String Validaciones()
+        {
+            if (cNumeroC == 0 || cNumeroC == null)
+            {
+                return "No hay Numero de Control Asociaso al Alumno";
+            }
+            if (cNombre == "" || cNombre == null){
+                return "Ingrese el Nombre del Alumno";
+            }
+
+            if (cAP1 == "" || cAP1 == null){
+                return "Ingrese el Apellido Paterno del Alumno";
+            }
+
+            if (cCarrera == "" || cCarrera == null){
+                return "Ingrese la Carrera del Alumno";
+            }
+
+            if (cSemestre == "" || cSemestre == null){
+                return "Ingrese el Semestre del Alumno";
+            }
+
+            if (cTel == 0 || cTel == null){
+                return "Ingrese el Numero Telefonico del Alumno";
+            }
+
+            if (cDirecc == "" || cDirecc == null){
+                return "Ingrese la Direccion del Alumno";
+            }
+
+            if (cTutor == "" || cTutor == null){
+                return "Ingrese el Nombre del Tutor del Alumno";
+            }
+
+            if (bImagen == null)
+            {
+                return "Capture la Foto del Alumno";
+            }
+
+            return "";
         }
     }
 }

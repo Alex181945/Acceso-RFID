@@ -8,9 +8,9 @@ using System.Windows.Forms;
 
 namespace RFID.Conexion
 {
-    class Conexion
+    public class Conexion
     {
-        public MySqlConnection ConexionDB()
+        public static MySqlConnection ConexionDB()
         {
             //Variables para la conexion
             MySqlConnection conexion = new MySqlConnection();

@@ -128,7 +128,7 @@
             this.boxImagen.Location = new System.Drawing.Point(4, 4);
             this.boxImagen.Name = "boxImagen";
             this.boxImagen.Size = new System.Drawing.Size(224, 216);
-            this.boxImagen.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.boxImagen.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.boxImagen.TabIndex = 24;
             this.boxImagen.TabStop = false;
             // 
