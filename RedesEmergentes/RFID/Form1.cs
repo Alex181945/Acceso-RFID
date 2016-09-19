@@ -39,21 +39,10 @@ namespace RFID
         private VideoCaptureDevice FuenteDeVideo = null;
 
 
-        //Variables de Arduino
-        SerialPort currentPort;
-        bool portFound;
-        String valor;
-
-        //Segundo Plano
-        System.ComponentModel.BackgroundWorker bgw = new System.ComponentModel.BackgroundWorker();
-
-
         public Form1()
         {
             InitializeComponent();
             BuscarDispositivos();
-            //bgw.DoWork += new System.ComponentModel.DoWorkEventHandler(bgw_DoWork);
-            LecturaRFID();
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
@@ -417,76 +406,6 @@ namespace RFID
             
         }
 
-        public String LecturaRFID()
-        {
-            Limpiar();
-            SerialPort serialPort = new SerialPort();
-            serialPort.PortName   = "COM3";
-            serialPort.BaudRate   = 9600;
-            serialPort.Parity     = Parity.None;
-            serialPort.DataBits   = 8;
-            serialPort.StopBits   = StopBits.One;
-            serialPort.ReceivedBytesThreshold = 1;
-            serialPort.Open();
-            var aux = serialPort.ReadLine();
-            txtNumeroC.Text = serialPort.ReadLine();
-            serialPort.Close();
-            return aux;
-        }
-
-        private void SetComPort()
-        {
-            try
-            {
-                string[] ports = SerialPort.GetPortNames();
-                foreach (string port in ports)
-                {
-                    MessageBox.Show(port);
-                    currentPort = new SerialPort(port, 9600);
-                    if (DetectArduino())
-                    {
-                        portFound = true;
-                        txtNumeroC.Text = valor;
-
-                    }
-                    else
-                    {
-                        portFound = false;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Error: "+e);
-            }
-        }
-
-        private bool DetectArduino()
-        {
-            try
-            {
-                currentPort.Parity = Parity.None;
-                currentPort.DataBits = 8;
-                currentPort.StopBits = StopBits.One;
-                currentPort.ReceivedBytesThreshold = 1;
-                currentPort.Open();
-                valor = currentPort.ReadLine();
-                currentPort.Close();
-
-                if (valor == "")
-                {
-                    return false;
-                }
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Error: " + e);
-                return false;
-            }
-        }
-
         public void Limpiar()
         {
             txtNumeroC.Text = "";
@@ -501,14 +420,31 @@ namespace RFID
             txtTutor.Text = "";
         }
 
-        void bgw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        void bgw_DoWork(object sender, DoWorkEventArgs e)
         {
-            SetComPort();
+            
         }
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            Consulta(131130194);
+            
+            //Arduino
+            SerialPort serialPort = new SerialPort();
+            serialPort.PortName = "COM3";
+            serialPort.BaudRate = 9600;
+            serialPort.Parity = Parity.None;
+            serialPort.DataBits = 8;
+            serialPort.StopBits = StopBits.One;
+            serialPort.ReceivedBytesThreshold = 1;
+            serialPort.Open();
+            var aux = serialPort.ReadLine();
+            serialPort.Close();
+
+            txtNumeroC.Text = aux;
+
+            MessageBox.Show(aux);
+
+            Consulta(int.Parse(aux));
         }
     }
 }
