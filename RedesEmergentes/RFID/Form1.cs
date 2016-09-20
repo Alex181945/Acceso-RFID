@@ -43,6 +43,8 @@ namespace RFID
         {
             InitializeComponent();
             BuscarDispositivos();
+            //Consulta();
+            txtNumeroC.Text = "1724369";
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
@@ -52,62 +54,7 @@ namespace RFID
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //Capturar Registro y Mandar a la Base
-
-            //Obtencion de valores de cajas de texto
-            cNumeroC   = int.Parse(txtNumeroC.Text);
-            cNombre    = txtNombre.Text.ToUpper();
-            cAP1       = txtAP1.Text.ToUpper();
-            cAP2       = txtAP2.Text.ToUpper();
-            cSangre    = txtSangre.Text.ToUpper();
-            cCarrera   = txtCarrera.Text.ToUpper();
-            cSemestre  = int.Parse(txtSemestre.Text);
-            cTutor     = txtTutor.Text.ToUpper();
-            cDirecc    = txtDireccion.Text.ToUpper();
-            cTel       = int.Parse(txtTelefono.Text);
-
-            //Validacion de campos
-            if (Validaciones() != "")
-                MessageBox.Show(Validaciones());
-            else {
-
-                //Conexion a la Base de Datos
-                MySqlConnection conn = Conexion.Conexion.ConexionDB();
-                MySqlCommand cmd = new MySqlCommand();
-
-                try
-                {
-
-                    //Almacenamiento de registro en base de datos
-                    cmd.Connection = conn;
-                    cmd.CommandText = "INSERT INTO alumnos VALUES (@num_control,@nombre," +
-                        "@Apaterno,@Amaterno,@carrera,@semestre,@tipo_sandre,@telecont,@dircont,@nom_tutor,@imagen)";
-                    cmd.Parameters.AddWithValue("@num_control", cNumeroC);
-                    cmd.Parameters.AddWithValue("@nombre", cNombre);
-                    cmd.Parameters.AddWithValue("@Apaterno", cAP1);
-                    cmd.Parameters.AddWithValue("@Amaterno", cAP2);
-                    cmd.Parameters.AddWithValue("@carrera", cCarrera);
-                    cmd.Parameters.AddWithValue("@semestre", cSemestre);
-                    cmd.Parameters.AddWithValue("@tipo_sandre", cSangre);
-                    cmd.Parameters.AddWithValue("@telecont", cTel);
-                    cmd.Parameters.AddWithValue("@dircont", cDirecc);
-                    cmd.Parameters.AddWithValue("@nom_tutor", cTutor);
-                    cmd.Parameters.AddWithValue("@imagen", bImagen);
-                    cmd.ExecuteNonQuery();
-
-                    MessageBox.Show("Registro Guardado");
-
-                    Limpiar();
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("Error Intente Mas Tarde");
-                }
-                finally
-                {
-                    conn.Close();
-                }
-            }
+            Registro();
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -335,29 +282,26 @@ namespace RFID
                 MySqlDataReader table = cmd.ExecuteReader();
 
                 while (table.Read())
-                {
-                    txtNumeroC.Text   = table.GetInt32("num_control").ToString();
-                    txtNombre.Text    = table.GetString("nombre");
-                    txtAP1.Text       = table.GetString("Apaterno");
-                    txtAP2.Text       = table.GetString("Amaterno");
-                    txtCarrera.Text   = table.GetString("carrera");
-                    txtSemestre.Text  = table.GetInt32("semestre").ToString();
-                    txtSangre.Text    = table.GetString("tipo_sandre");
-                    txtTelefono.Text  = table.GetInt32("telecont").ToString();
-                    txtDireccion.Text = table.GetString("dircont");
-                    txtTutor.Text     = table.GetString("nom_tutor");
-                    
-                    
-                }
+                    {
+                        //txtNumeroC.Text = table.GetInt32("num_control").ToString();
+                        txtNombre.Text = table.GetString("nombre");
+                        txtAP1.Text = table.GetString("Apaterno");
+                        txtAP2.Text = table.GetString("Amaterno");
+                        txtCarrera.Text = table.GetString("carrera");
+                        txtSemestre.Text = table.GetInt32("semestre").ToString();
+                        txtSangre.Text = table.GetString("tipo_sandre");
+                        txtTelefono.Text = table.GetInt32("telecont").ToString();
+                        txtDireccion.Text = table.GetString("dircont");
+                        txtTutor.Text = table.GetString("nom_tutor");
+                    }
+
+                conn.Close();
+
             }
             catch (Exception)
             {
                 MessageBox.Show("Error Intente Mas Tarde");
                 throw;
-            }
-            finally
-            {
-                conn.Close();
             }
 
             //Consulta exclusiva para foto, no datos
@@ -427,10 +371,14 @@ namespace RFID
 
         private void button1_Click_1(object sender, EventArgs e)
         {
+            if (txtNumeroC.Text != "")
+            {
+                Consulta(int.Parse(txtNumeroC.Text));
+            }
             
             //Arduino
             SerialPort serialPort = new SerialPort();
-            serialPort.PortName = "COM3";
+            serialPort.PortName = "COM8";
             serialPort.BaudRate = 9600;
             serialPort.Parity = Parity.None;
             serialPort.DataBits = 8;
@@ -442,9 +390,72 @@ namespace RFID
 
             txtNumeroC.Text = aux;
 
-            MessageBox.Show(aux);
+            //MessageBox.Show(aux);
 
-            Consulta(int.Parse(aux));
+            //Consulta(int.Parse(aux)); 
+
+            //Consulta(int.Parse(txtNumeroC.Text));
+        }
+
+        public void Registro()
+        {
+            //Capturar Registro y Mandar a la Base
+
+            //Obtencion de valores de cajas de texto
+            cNumeroC = int.Parse(txtNumeroC.Text);
+            cNombre = txtNombre.Text.ToUpper();
+            cAP1 = txtAP1.Text.ToUpper();
+            cAP2 = txtAP2.Text.ToUpper();
+            cSangre = txtSangre.Text.ToUpper();
+            cCarrera = txtCarrera.Text.ToUpper();
+            cSemestre = int.Parse(txtSemestre.Text);
+            cTutor = txtTutor.Text.ToUpper();
+            cDirecc = txtDireccion.Text.ToUpper();
+            cTel = int.Parse(txtTelefono.Text);
+
+            //Validacion de campos
+            if (Validaciones() != "")
+                MessageBox.Show(Validaciones());
+            else
+            {
+
+                //Conexion a la Base de Datos
+                MySqlConnection conn = Conexion.Conexion.ConexionDB();
+                MySqlCommand cmd = new MySqlCommand();
+
+                try
+                {
+
+                    //Almacenamiento de registro en base de datos
+                    cmd.Connection = conn;
+                    cmd.CommandText = "INSERT INTO alumnos VALUES (@num_control,@nombre," +
+                        "@Apaterno,@Amaterno,@carrera,@semestre,@tipo_sandre,@telecont,@dircont,@nom_tutor,@imagen)";
+                    cmd.Parameters.AddWithValue("@num_control", cNumeroC);
+                    cmd.Parameters.AddWithValue("@nombre", cNombre);
+                    cmd.Parameters.AddWithValue("@Apaterno", cAP1);
+                    cmd.Parameters.AddWithValue("@Amaterno", cAP2);
+                    cmd.Parameters.AddWithValue("@carrera", cCarrera);
+                    cmd.Parameters.AddWithValue("@semestre", cSemestre);
+                    cmd.Parameters.AddWithValue("@tipo_sandre", cSangre);
+                    cmd.Parameters.AddWithValue("@telecont", cTel);
+                    cmd.Parameters.AddWithValue("@dircont", cDirecc);
+                    cmd.Parameters.AddWithValue("@nom_tutor", cTutor);
+                    cmd.Parameters.AddWithValue("@imagen", bImagen);
+                    cmd.ExecuteNonQuery();
+
+                    MessageBox.Show("Registro Guardado");
+
+                    Limpiar();
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Error Intente Mas Tarde");
+                }
+                finally
+                {
+                    conn.Close();
+                }
+            }
         }
     }
 }
