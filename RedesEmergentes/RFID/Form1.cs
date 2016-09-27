@@ -41,10 +41,20 @@ namespace RFID
 
         public Form1()
         {
+            CheckForIllegalCrossThreadCalls = false;
             InitializeComponent();
             BuscarDispositivos();
-            //Consulta();
-            txtNumeroC.Text = "1724369";
+            //Arduino
+            SerialPort serialPort = new SerialPort();
+            serialPort.PortName = "COM8";
+            serialPort.BaudRate = 9600;
+            serialPort.Parity = Parity.None;
+            serialPort.DataBits = 8;
+            serialPort.StopBits = StopBits.One;
+            serialPort.ReceivedBytesThreshold = 1;
+            serialPort.DataReceived += new SerialDataReceivedEventHandler(LeerID);
+            serialPort.Open();
+            serialPort.Close();
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
@@ -274,8 +284,7 @@ namespace RFID
 
                 //Consulta de registro en base de datos
                 cmd.Connection = conn;
-                cmd.CommandText = "SELECT num_control, nombre, Apaterno, Amaterno, tipo_sandre, carrera," +
-                    "semestre, nom_tutor, dircont, telecont FROM alumnos WHERE num_control = @num_control";
+                cmd.CommandText = "SELECT * FROM alumnos WHERE num_control = @num_control";
                 
                 cmd.Parameters.AddWithValue("@num_control", numControl);
 
@@ -369,34 +378,6 @@ namespace RFID
             
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-            if (txtNumeroC.Text != "")
-            {
-                Consulta(int.Parse(txtNumeroC.Text));
-            }
-            
-            //Arduino
-            SerialPort serialPort = new SerialPort();
-            serialPort.PortName = "COM8";
-            serialPort.BaudRate = 9600;
-            serialPort.Parity = Parity.None;
-            serialPort.DataBits = 8;
-            serialPort.StopBits = StopBits.One;
-            serialPort.ReceivedBytesThreshold = 1;
-            serialPort.Open();
-            var aux = serialPort.ReadLine();
-            serialPort.Close();
-
-            txtNumeroC.Text = aux;
-
-            //MessageBox.Show(aux);
-
-            //Consulta(int.Parse(aux)); 
-
-            //Consulta(int.Parse(txtNumeroC.Text));
-        }
-
         public void Registro()
         {
             //Capturar Registro y Mandar a la Base
@@ -456,6 +437,41 @@ namespace RFID
                     conn.Close();
                 }
             }
+        }
+
+        public void LeerID(object sender, SerialDataReceivedEventArgs e)
+        {
+            SerialPort sp = (SerialPort)sender;
+            String aux = sp.ReadExisting();
+
+            Decision(int.Parse(aux));
+            
+        }
+
+        public void Decision(int numControl)
+        {
+            //Conexion a la Base de Datos
+            MySqlConnection conn = Conexion.Conexion.ConexionDB();
+            MySqlCommand cmd = new MySqlCommand();
+
+            //Consulta de registro en base de datos
+            cmd.Connection = conn;
+            cmd.CommandText = "SELECT * FROM alumnos WHERE num_control = @num_control";
+            cmd.Parameters.AddWithValue("@num_control", numControl);
+
+            MySqlDataReader table = cmd.ExecuteReader();
+
+            if (table.Read())
+            {
+                conn.Close();
+                Consulta(numControl);
+            }
+            else
+            {
+                conn.Close();
+                Registro();
+            }
+
         }
     }
 }
