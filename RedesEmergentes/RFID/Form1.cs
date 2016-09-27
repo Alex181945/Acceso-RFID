@@ -373,11 +373,6 @@ namespace RFID
             txtTutor.Text = "";
         }
 
-        void bgw_DoWork(object sender, DoWorkEventArgs e)
-        {
-            
-        }
-
         public void Registro()
         {
             //Capturar Registro y Mandar a la Base
