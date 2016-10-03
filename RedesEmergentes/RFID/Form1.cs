@@ -53,7 +53,7 @@ namespace RFID
             serialPort.StopBits = StopBits.One;
             serialPort.ReceivedBytesThreshold = 1;
             serialPort.DataReceived += new SerialDataReceivedEventHandler(LeerID);
-            serialPort.Open();
+            //serialPort.Open();
             serialPort.Close();
         }
 
