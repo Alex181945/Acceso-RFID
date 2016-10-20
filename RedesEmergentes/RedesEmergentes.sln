@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RFID", "RFID\RFID.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlDeAcceso", "ControlDeAcceso\ControlDeAcceso.csproj", "{53378504-D1F5-4F23-9D58-B892FC422196}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KEYPAD", "KEYPAD\KEYPAD.csproj", "{DB857400-8BA6-4BA9-B223-100B23D21A17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{53378504-D1F5-4F23-9D58-B892FC422196}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53378504-D1F5-4F23-9D58-B892FC422196}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53378504-D1F5-4F23-9D58-B892FC422196}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB857400-8BA6-4BA9-B223-100B23D21A17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB857400-8BA6-4BA9-B223-100B23D21A17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB857400-8BA6-4BA9-B223-100B23D21A17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB857400-8BA6-4BA9-B223-100B23D21A17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
